@@ -2081,6 +2081,40 @@ export function isPublishSidebarEnabled( state ) {
 	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
 }
 
+/**
+ * Returns the annotations for a specific client ID.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} clientId The ID of the block to get the annotations for.
+ *
+ * @return {Array} The annotations applicable to this block.
+ */
+export const getAnnotationsForBlock = createSelector(
+	( state, clientId ) => {
+		return state.annotations.filter( ( annotation ) => {
+			return !! annotation.isBlockAnnotation && annotation.block === clientId;
+		} );
+	},
+	( state ) => [
+		state.annotations,
+	]
+);
+
+export const getAnnotationsForRichText = createSelector(
+	( state, clientId ) => {
+		return state.annotations.filter( ( annotation ) => {
+			return ! annotation.isBlockAnnotation && annotation.block === clientId;
+		} );
+	},
+	( state ) => [
+		state.annotations,
+	]
+);
+
+export function getAnnotations( state ) {
+	return state.annotations;
+}
+
 //
 // Deprecated
 //

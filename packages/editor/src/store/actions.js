@@ -2,6 +2,7 @@
  * External Dependencies
  */
 import { partial, castArray } from 'lodash';
+import uuid from 'uuid/v4';
 
 /**
  * WordPress dependencies
@@ -792,6 +793,86 @@ export function addTermToEditedPost( slug, term ) {
 		type: 'ADD_TERM_TO_EDITED_POST',
 		slug,
 		term,
+	};
+}
+
+/**
+ * Adds an annotation to a block.
+ *
+ * The `block` attribute refers to a block ID that needs to be annotated.
+ * `isBlockAnnotation` controls whether or not the annotation is a block
+ * annotation. The `source` is the source of the annotation, this will be used
+ * to identity groups of annotations.
+ *
+ * The `startXpath`, `startOffset`, `endXPath` and `endOffset` arguments are
+ * only relevant when the annotation is not a block annotation.
+ *
+ * @param {Object} annotation         The annotation to add.
+ * @param {string} block              The block to add the annotation to.
+ * @param {string} startXPath         The XPath where the annotation should start.
+ * @param {number} startOffset        The offset where the annotation should start.
+ * @param {string} endXPath           The XPath where the annotation should end.
+ * @param {number} endOffset          The offset where the annotation should end.
+ * @param {string} [source="default"] The source that added the annotation.
+ * @param {string} [id=uuid()]        The ID the annotation should have. Generates a UUID by default.
+ *
+ * @return {Object} Action object.
+ */
+export function addAnnotation( { block, startXPath, startOffset, endXPath, endOffset, isBlockAnnotation = false, source = 'default', id = uuid() } ) {
+	return {
+		type: 'ANNOTATION_ADD',
+		id,
+		block,
+		source,
+		isBlockAnnotation,
+		startXPath,
+		startOffset,
+		endXPath,
+		endOffset,
+	};
+}
+
+/**
+ * Removes an annotation with a specific ID.
+ *
+ * @param {string} annotationId The annotation to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeAnnotation( annotationId ) {
+	return {
+		type: 'ANNOTATION_REMOVE',
+		annotationId,
+	};
+}
+
+/**
+ * Removes all annotations of a specific source.
+ *
+ * @param {string} source The source to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeAnnotationsBySource( source ) {
+	return {
+		type: 'ANNOTATION_REMOVE_SOURCE',
+		source,
+	};
+}
+
+/**
+ * Moves an annotation to a different XPath.
+ *
+ * @param {string} annotationId The annotation to change.
+ * @param {Object} xpath        The new location for the annotation.
+ *
+ * @return {Object} Action object.
+ */
+export function moveAnnotation( annotationId, xpath ) {
+	return {
+		type: 'ANNOTATION_MOVE',
+		annotationId,
+		xpath,
 	};
 }
 

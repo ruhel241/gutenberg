@@ -42,6 +42,8 @@ import {
 	getSelectionEnd,
 	remove,
 	isCollapsed,
+	matchXPath,
+	removeFormat,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -455,9 +457,12 @@ export class RichText extends Component {
 			this.applyRecord( record );
 		}
 
-		const { start, end } = record;
+		// Filter out annotations
+		const filteredRecord = removeFormat( record, 'mark', 0, record.text.length );
 
-		this.savedContent = this.valueToFormat( record );
+		const { start, end } = filteredRecord;
+
+		this.savedContent = this.valueToFormat( filteredRecord );
 		this.props.onChange( this.savedContent );
 		this.setState( { start, end } );
 	}
@@ -738,13 +743,66 @@ export class RichText extends Component {
 		}
 	}
 
+	/**
+	 * Applies given annotations to the given record.
+	 *
+	 * @param {Object} record The record to apply annotations to.
+	 * @param {Array} annotations The annotation to apply.
+	 * @return {Object} A record with the annotations applied.
+	 */
+	applyAnnotations( record, annotations ) {
+		annotations
+			.map( ( annotation ) => {
+				let startPos = matchXPath( record, annotation.startXPath );
+				let endPos = matchXPath( record, annotation.endXPath );
+
+				if ( startPos !== false ) {
+					startPos += annotation.startOffset;
+				}
+
+				if ( endPos !== false ) {
+					endPos += annotation.endOffset;
+				}
+
+				if (
+					startPos !== false &&
+					endPos !== false &&
+					startPos <= endPos &&
+					startPos <= record.text.length &&
+					endPos <= record.text.length
+				) {
+					return {
+						start: startPos,
+						end: endPos,
+						className: 'annotation-text annotation-text-' + annotation.source,
+					};
+				}
+
+				return false;
+			} )
+			.filter( Boolean )
+			.forEach( ( { start, end, className } ) => {
+				record = applyFormat(
+					record,
+					{ type: 'mark', attributes: { class: className } },
+					start,
+					end
+				);
+			} );
+
+		return record;
+	}
+
 	componentDidUpdate( prevProps ) {
-		const { tagName, value, isSelected } = this.props;
+		const { tagName, value, isSelected, annotations } = this.props;
+
+		const applyAnnotations = annotations !== prevProps.annotations;
 
 		if (
-			tagName === prevProps.tagName &&
+			( tagName === prevProps.tagName &&
 			value !== prevProps.value &&
-			value !== this.savedContent
+			value !== this.savedContent ) ||
+			applyAnnotations
 		) {
 			// Handle deprecated `children` and `node` sources.
 			// The old way of passing a value with the `node` matcher required
@@ -756,7 +814,7 @@ export class RichText extends Component {
 				return;
 			}
 
-			const record = this.formatToValue( value );
+			const record = this.applyAnnotations( this.formatToValue( value ), annotations );
 
 			if ( isSelected ) {
 				const prevRecord = this.formatToValue( prevProps.value );
@@ -936,6 +994,7 @@ const RichTextContainer = compose( [
 		if ( ownProps.isSelected === true ) {
 			return {
 				isSelected: context.isSelected,
+				clientId: context.clientId,
 			};
 		}
 
@@ -943,16 +1002,20 @@ const RichTextContainer = compose( [
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
 			setFocusedElement: context.setFocusedElement,
+			clientId: context.clientId,
 		};
 	} ),
-	withSelect( ( select ) => {
+	withSelect( ( select, props ) => {
 		const { isViewportMatch } = select( 'core/viewport' );
-		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
+		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText, getAnnotationsForRichText } = select( 'core/editor' );
+
+		const annotations = getAnnotationsForRichText( props.clientId );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
+			annotations,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

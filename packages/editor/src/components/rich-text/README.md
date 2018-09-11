@@ -57,6 +57,34 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* A list of autocompleters to use instead of the default.
 
+### `annotations: Array`
+
+*Optional.* A list of annotations that should be applied to the content.
+
+An annotation has the following shape:
+
+```js
+{
+	// The source of the annotation, will be used for the HTML class.
+	"source": "annotations-tester",
+	
+	// The ID of the block to annotate. Currently text annotation will try to annotate all RichText elements within a block.
+	"block": "[blockId]",
+	
+	// The starting XPath for the annotation, this is relative to the `RichText` containing element. Must be continious from the container element. Matched element must be a text node.
+	"startXPath": "text()[1]",
+	
+	// The starting offset within the element matched by the XPath.
+	"startOffset": 106,
+	
+	// The ending XPath for the annotation.
+	"endXPath": "strong[1]/text()[1]",
+	
+	// The ending offset within the element matched by the XPath.
+	"endOffset": 75
+}
+```
+
 ## RichText.Content
 
 `RichText.Content` should be used in the `save` function of your block to correctly save rich text content.
