@@ -160,7 +160,7 @@ class GalleryEdit extends Component {
 
 	render() {
 		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, imageIds = [], columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const dropZone = (
 			<DropZone
@@ -192,7 +192,7 @@ class GalleryEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( images.length === 0 ) {
+		if ( images.length === 0 && imageIds.length === 0 ) {
 			return (
 				<Fragment>
 					{ controls }
@@ -245,6 +245,20 @@ class GalleryEdit extends Component {
 					{ dropZone }
 					{ images.map( ( img, index ) => (
 						<li className="blocks-gallery-item" key={ img.id || img.url }>
+							<GalleryImage
+								url={ img.url }
+								alt={ img.alt }
+								id={ img.id }
+								isSelected={ isSelected && this.state.selectedImage === index }
+								onRemove={ this.onRemoveImage( index ) }
+								onSelect={ this.onSelectImage( index ) }
+								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
+								caption={ img.caption }
+							/>
+						</li>
+					) ) }
+					{ imageIds.map( ( img, index ) => (
+						! images[ index ].id && <li className="blocks-gallery-item" key={ img.id || img.url }>
 							<GalleryImage
 								url={ img.url }
 								alt={ img.alt }
