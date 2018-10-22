@@ -249,20 +249,7 @@ class GalleryEdit extends Component {
 								url={ img.url }
 								alt={ img.alt }
 								id={ img.id }
-								isSelected={ isSelected && this.state.selectedImage === index }
-								onRemove={ this.onRemoveImage( index ) }
-								onSelect={ this.onSelectImage( index ) }
-								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
-								caption={ img.caption }
-							/>
-						</li>
-					) ) }
-					{ imageIds.map( ( img, index ) => (
-						! images[ index ].id && <li className="blocks-gallery-item" key={ img.id || img.url }>
-							<GalleryImage
-								url={ img.url }
-								alt={ img.alt }
-								id={ img.id }
+								seedId={ imageIds[ index ] }
 								isSelected={ isSelected && this.state.selectedImage === index }
 								onRemove={ this.onRemoveImage( index ) }
 								onSelect={ this.onSelectImage( index ) }
