@@ -11,6 +11,7 @@ import {
 	filter,
 	first,
 	flatMap,
+	pickBy,
 	uniq,
 	isFunction,
 	isEmpty,
@@ -41,7 +42,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const attributes = reduce( blockType.attributes, ( result, schema, key ) => {
+	let attributes = reduce( blockType.attributes, ( result, schema, key ) => {
 		const value = blockAttributes[ key ];
 
 		if ( undefined !== value ) {
@@ -66,6 +67,16 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 
 		return result;
 	}, {} );
+
+	// "Silent attributes" are the exception to the above. They are attributes
+	// whose names start with an underscore. They act as cues that a block's
+	// `edit` method can interpret before it decides to trigger attribute
+	// changes on its own.
+	const silentAttributes = pickBy(
+		blockAttributes,
+		( value, key ) => key.indexOf( '_' ) === 0
+	);
+	attributes = { ...attributes, ...silentAttributes };
 
 	const clientId = uuid();
 
