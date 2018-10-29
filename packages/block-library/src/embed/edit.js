@@ -1,9 +1,4 @@
 /**
- * Internal dependencies
- */
-import { findBlock, isFromWordPress } from './util';
-import { HOSTS_NO_PREVIEWS, ASPECT_RATIOS, DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK } from './constants';
-/**
  * External dependencies
  */
 import { parse } from 'url';
@@ -27,6 +22,13 @@ import {
 } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls, BlockIcon, InspectorControls } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { findBlock, isFromWordPress } from './util';
+import { HOSTS_NO_PREVIEWS, ASPECT_RATIOS, DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK } from './constants';
+import WpEmbedContainer from './wp-embed-container';
 
 export function getEmbedEditComponent( title, icon, responsive = true ) {
 	return class extends Component {
@@ -343,9 +345,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
 			const sandboxClassnames = classnames( type, className );
 			const embedWrapper = 'wp-embed' === type ? (
-				<div
-					className="wp-block-embed__wrapper"
-					dangerouslySetInnerHTML={ { __html: html } }
+				<WpEmbedContainer
+					html={ html }
 				/>
 			) : (
 				<div className="wp-block-embed__wrapper">
