@@ -968,7 +968,7 @@ export class RichText extends Component {
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 								</Tagname>
 							}
-							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
+							{ isSelected && <FormatEdit value={ this.applyAnnotations( record, this.props.annotations ) } onChange={ this.onChange } /> }
 						</Fragment>
 					) }
 				</Autocomplete>
