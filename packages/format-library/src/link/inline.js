@@ -190,13 +190,11 @@ class InlineLinkUI extends Component {
 			onChange( applyFormat( value, format ) );
 		}
 
-		if ( isInvalidLinkURL( url ) ) {
-			speak( __( 'Warning: the link has been inserted but may have errors. Please test it.' ), 'assertive' );
-		}
-
 		this.resetState();
 
-		if ( isActive ) {
+		if ( isInvalidLinkURL( url ) ) {
+			speak( __( 'Warning: the link has been inserted but may have errors. Please test it.' ), 'assertive' );
+		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
 			speak( __( 'Link added.' ), 'assertive' );
