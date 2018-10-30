@@ -1389,6 +1389,7 @@ the specified post object and editor settings.
 *Parameters*
 
  * post: Post object.
+ * edits: Initial edited attributes object.
 
 ### resetPost
 
@@ -1425,7 +1426,6 @@ Returns an action object used to setup the editor state when first opening an ed
 
  * post: Post object.
  * blocks: Array of blocks.
- * edits: Initial edited attributes object.
 
 ### resetBlocks
 
@@ -1571,6 +1571,15 @@ Returns an action object resetting the template validity.
 ### synchronizeTemplate
 
 Returns an action object synchronize the template with the list of blocks
+
+### editPost
+
+Returns an action object used in signalling that attributes of the post have
+been edited.
+
+*Parameters*
+
+ * edits: Post attributes to edit.
 
 ### savePost
 

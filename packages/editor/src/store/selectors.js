@@ -220,9 +220,18 @@ export function getCurrentPostLastRevisionId( state ) {
  *
  * @return {Object} Object of key value pairs comprising unsaved edits.
  */
-export function getPostEdits( state ) {
-	return state.editor.present.edits;
-}
+export const getPostEdits = createSelector(
+	( state ) => {
+		return {
+			...state.initialEdits,
+			...state.editor.present.edits,
+		};
+	},
+	( state ) => [
+		state.editor.present.edits,
+		state.initialEdits,
+	]
+);
 
 /**
  * Returns an attribute value of the saved post.
@@ -591,6 +600,7 @@ export const getBlock = createSelector(
 		state.editor.present.blocks.byClientId[ clientId ],
 		getBlockDependantsCacheBust( state, clientId ),
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -698,6 +708,7 @@ export const getBlocksByClientId = createSelector(
 	),
 	( state ) => [
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 		state.editor.present.blocks,
 	]
@@ -1016,6 +1027,7 @@ export const getMultiSelectedBlocks = createSelector(
 		state.blockSelection.end,
 		state.editor.present.blocks.byClientId,
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -1533,6 +1545,7 @@ export const getEditedPostContent = createSelector(
 	},
 	( state ) => [
 		state.editor.present.edits.content,
+		state.initialEdits.content,
 		state.editor.present.blocks,
 	],
 );
