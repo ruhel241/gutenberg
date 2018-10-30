@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import ReactTestRenderer from 'react-test-renderer';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ jest.mock( '../../../../../../components/src/button' );
 
 describe( 'PluginPrePublishPanel', () => {
 	test( 'renders fill properly', () => {
-		const wrapper = mount(
+		const tree = ReactTestRenderer.create(
 			<SlotFillProvider>
 				<PluginPrePublishPanel
 					className="my-plugin-pre-publish-panel"
@@ -28,8 +28,8 @@ describe( 'PluginPrePublishPanel', () => {
 				</PluginPrePublishPanel>
 				<PluginPrePublishPanel.Slot />
 			</SlotFillProvider>
-		);
+		).toJSON();
 
-		expect( wrapper.find( 'Slot' ).children() ).toMatchSnapshot();
+		expect( tree ).toMatchSnapshot();
 	} );
 } );
