@@ -23,6 +23,7 @@ import { URLInput, URLPopover } from '@wordpress/editor';
  * Internal dependencies
  */
 import PositionedAtSelection from './positioned-at-selection';
+import { isInvalidLinkURL } from './utils';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -174,6 +175,10 @@ class InlineLinkUI extends Component {
 			onChange( insert( value, toInsert ) );
 		} else {
 			onChange( applyFormat( value, format ) );
+		}
+
+		if ( isInvalidLinkURL( url ) ) {
+			speak( __( 'Warning: the link has been inserted but may have errors. Please test it.' ), 'assertive' );
 		}
 
 		this.resetState();
