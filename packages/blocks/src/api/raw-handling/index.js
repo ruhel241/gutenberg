@@ -170,6 +170,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 		};
 
 		piece = deepFilterHTML( piece, filters, blockContentSchema );
+		const originalPieceFiltered = piece;
 		piece = removeInvalidHTML( piece, schema );
 		piece = normaliseBlocks( piece );
 
@@ -190,7 +191,9 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 					'Sanitized HTML: `' + node.outerHTML + '`'
 				);
 
-				return;
+				return createBlock( 'core/html', {
+					content: originalPieceFiltered,
+				} );
 			}
 
 			const { transform, blockName } = rawTransformation;
