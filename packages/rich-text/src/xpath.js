@@ -90,7 +90,9 @@ function findNodeWithIndex( type, index, children = [] ) {
  * @return {number} The position of the matched 'element'.
  */
 export function matchXPath( record, xpath ) {
-	const tree = toTree( record, false, {
+	const tree = toTree( {
+		value: record,
+		multilineTag: false,
 		createEmpty,
 		append,
 		getLastChild,
