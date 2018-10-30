@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
@@ -79,23 +84,31 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 );
 
-const LinkViewer = ( { url, editLink } ) => (
-	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
-	<div
-		className="editor-format-toolbar__link-container-content"
-		onKeyPress={ stopKeyPropagation }
-	>
-		<ExternalLink
-			className="editor-format-toolbar__link-container-value"
-			href={ url }
+const LinkViewer = ( { url, editLink } ) => {
+	const prependedURL = prependHTTP( url );
+	const hasInvalidLink = isInvalidLinkURL( prependedURL );
+	const linkClassName = classnames( 'editor-format-toolbar__link-container-value', {
+		'has-invalid-link': hasInvalidLink,
+	} );
+
+	return (
+		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		<div
+			className="editor-format-toolbar__link-container-content"
+			onKeyPress={ stopKeyPropagation }
 		>
-			{ filterURLForDisplay( safeDecodeURI( url ) ) }
-		</ExternalLink>
-		<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
-	</div>
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
-);
+			<ExternalLink
+				className={ linkClassName }
+				href={ url }
+			>
+				{ filterURLForDisplay( safeDecodeURI( url ) ) }
+			</ExternalLink>
+			<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
+		</div>
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
+	);
+};
 
 class InlineLinkUI extends Component {
 	constructor() {
