@@ -41,6 +41,7 @@ import { resolveSelector } from './utils';
  */
 export const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
+const VIEW_AS_CONTAINER_ID = 'wp-admin-bar-view';
 
 /**
  * Request Post Update Effect handler
@@ -164,6 +165,32 @@ export const requestPostUpdate = async ( action, store ) => {
 			error,
 		} );
 	}
+};
+
+/**
+ * Update view as link handler.
+ * Performs a side effect of updating the "View as" link on the top bar.
+ * This link is generated on the server and during a post update it may change,
+ * and the page is not reloaded so the link continues to be the same,
+ * this effect makes sure this link is always up to date.
+ *
+ * @param {Object} action  action object.
+ * @param {Object} store   Redux Store.
+ */
+export const updateViewAsLink = ( action ) => {
+	const newPermalink = action.post.link;
+	const previousPermalink = action.previousPost.link;
+	if ( newPermalink === previousPermalink || ! newPermalink ) {
+		return;
+	}
+
+	const nodeToUpdate = document.querySelector(
+		`#${ VIEW_AS_CONTAINER_ID } a[href="${ previousPermalink }"]`
+	);
+	if ( ! nodeToUpdate ) {
+		return;
+	}
+	nodeToUpdate.setAttribute( 'href', newPermalink );
 };
 
 /**

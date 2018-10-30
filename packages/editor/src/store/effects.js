@@ -46,11 +46,12 @@ import {
 } from './effects/reusable-blocks';
 import {
 	requestPostUpdate,
-	requestPostUpdateSuccess,
+	updateViewAsLink,
 	requestPostUpdateFailure,
 	trashPost,
 	trashPostFailure,
 	refreshPost,
+	updateViewAsPermalink,
 } from './effects/posts';
 import {
 	addTermToEditedPost,
@@ -144,7 +145,10 @@ export default {
 	REQUEST_POST_UPDATE: ( action, store ) => {
 		requestPostUpdate( action, store );
 	},
-	REQUEST_POST_UPDATE_SUCCESS: requestPostUpdateSuccess,
+	REQUEST_POST_UPDATE_SUCCESS: [
+		updateViewAsLink,
+		updateViewAsPermalink,
+	],
 	REQUEST_POST_UPDATE_FAILURE: requestPostUpdateFailure,
 	TRASH_POST: ( action, store ) => {
 		trashPost( action, store );
