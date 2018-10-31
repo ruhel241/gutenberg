@@ -15,9 +15,6 @@ import {
 	isEqual,
 	overSome,
 	get,
-	find,
-	map,
-	partialRight,
 } from 'lodash';
 
 /**
@@ -1152,31 +1149,14 @@ export function annotations( state = { all: [], byBlockId: {} }, action ) {
 			return {
 				all: state.all.filter( ( annotation ) => annotation.id !== action.annotationId ),
 
-				// We use filterWithReference to not refresh the reference if a block still has the same annotations.
-				byBlockId: map( state.byBlockId, partialRight( filterWithReference, ( annotationId ) => annotationId !== action.annotationId ) ),
-			};
-
-		case 'ANNOTATION_MOVE':
-			const annotationToMove = find( state.all, [ 'id', action.annotationId ] );
-			const xpath = action.xpath;
-
-			// Cannot move an annotation that isn't present.
-			if ( ! annotationToMove ) {
-				return state.all;
-			}
-
-			return [
-				...state.all.filter( ( annotation ) => {
-					return annotation.id !== action.annotationId;
+				// We use filterWithReference to not refresh the reference if a block still has
+				// the same annotations.
+				byBlockId: mapValues( state.byBlockId, ( annotationForBlock ) => {
+					return filterWithReference( annotationForBlock, ( annotationId ) => {
+						return annotationId !== action.annotationId;
+					} );
 				} ),
-				{
-					...annotationToMove,
-					startXPath: xpath.start,
-					startOffset: xpath.startOffset,
-					endXPath: xpath.end,
-					endOffset: xpath.endOffset,
-				},
-			];
+			};
 
 		case 'ANNOTATION_REMOVE_SOURCE':
 			const idsToRemove = [];
@@ -1192,7 +1172,7 @@ export function annotations( state = { all: [], byBlockId: {} }, action ) {
 
 			return {
 				all: allAnnotations,
-				byBlockId: map( state.byBlockId, ( annotationForBlock ) => {
+				byBlockId: mapValues( state.byBlockId, ( annotationForBlock ) => {
 					return filterWithReference( annotationForBlock, ( annotationId ) => {
 						return ! idsToRemove.includes( annotationId );
 					} );

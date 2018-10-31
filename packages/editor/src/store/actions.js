@@ -860,22 +860,6 @@ export function removeAnnotationsBySource( source ) {
 	};
 }
 
-/**
- * Moves an annotation to a different XPath.
- *
- * @param {string} annotationId The annotation to change.
- * @param {Object} xpath        The new location for the annotation.
- *
- * @return {Object} Action object.
- */
-export function moveAnnotation( annotationId, xpath ) {
-	return {
-		type: 'ANNOTATION_MOVE',
-		annotationId,
-		xpath,
-	};
-}
-
 //
 // Deprecated
 //

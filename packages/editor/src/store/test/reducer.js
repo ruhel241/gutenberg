@@ -35,7 +35,7 @@ import {
 	template,
 	blockListSettings,
 	autosave,
-	postSavingLock,
+	postSavingLock, annotations,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2251,6 +2251,111 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'annotations', () => {
+		it( 'returns all annotations and annotation IDs per block', () => {
+			const state = annotations( undefined, {} );
+
+			expect( state ).toEqual( { all: [], byBlockId: {} } );
+		} );
+
+		it( 'returns a state with an annotation that has been added', () => {
+			const state = annotations( undefined, {
+				type: 'ANNOTATION_ADD',
+				id: 'annotationId',
+				block: 'blockId',
+				source: 'default',
+				isBlockAnnotation: true,
+			} );
+
+			expect( state ).toEqual( {
+				all: [
+					{
+						id: 'annotationId',
+						block: 'blockId',
+						source: 'default',
+						isBlockAnnotation: true,
+						startXPath: undefined,
+						startOffset: undefined,
+						endXPath: undefined,
+						endOffset: undefined,
+					},
+				],
+				byBlockId: {
+					blockId: [ 'annotationId' ],
+				},
+			} );
+		} );
+
+		it( 'allows an annotation to be removed', () => {
+			const state = annotations( {
+				all: [
+					{
+						id: 'annotationId',
+						block: 'blockId',
+						source: 'default',
+						isBlockAnnotation: true,
+						startXPath: undefined,
+						startOffset: undefined,
+						endXPath: undefined,
+						endOffset: undefined,
+					},
+				],
+				byBlockId: {
+					blockId: [ 'annotationId' ],
+				},
+			}, {
+				type: 'ANNOTATION_REMOVE',
+				annotationId: 'annotationId',
+			} );
+
+			expect( state ).toEqual( { all: [], byBlockId: { blockId: [] } } );
+		} );
+
+		it( 'allows an annotation to be removed by its source', () => {
+			const annotation1 = {
+				id: 'annotationId',
+				block: 'blockId',
+				source: 'default',
+				isBlockAnnotation: true,
+				startXPath: undefined,
+				startOffset: undefined,
+				endXPath: undefined,
+				endOffset: undefined,
+			};
+			const annotation2 = {
+				id: 'annotationId2',
+				block: 'blockId2',
+				source: 'other-source',
+				isBlockAnnotation: true,
+				startXPath: undefined,
+				startOffset: undefined,
+				endXPath: undefined,
+				endOffset: undefined,
+			};
+			const state = annotations( {
+				all: [
+					annotation1,
+					annotation2,
+				],
+				byBlockId: {
+					blockId: [ 'annotationId' ],
+					blockId2: [ 'annotationId2' ],
+				},
+			}, {
+				type: 'ANNOTATION_REMOVE_SOURCE',
+				source: 'default',
+			} );
+
+			expect( state ).toEqual( {
+				all: [ annotation2 ],
+				byBlockId: {
+					blockId: [],
+					blockId2: [ 'annotationId2' ],
+				},
+			} );
 		} );
 	} );
 } );
