@@ -3,11 +3,11 @@
  */
 import Slot from './slot';
 import Fill from './fill';
-import Provider, { Consumer } from './context';
+import Provider from './context';
 
 export { Slot };
 export { Fill };
-export { Provider, Consumer };
+export { Provider };
 
 export function createSlotFill( name ) {
 	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
