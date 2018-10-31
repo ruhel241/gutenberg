@@ -8,6 +8,11 @@ import { matchXPath } from '../xpath';
 console.log.mockRestore();
 
 describe( 'matchXPath', () => {
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
+
 	it( 'should match a plain structure', () => {
 		const plainRecord = {
 			formats: [ , , , ],
