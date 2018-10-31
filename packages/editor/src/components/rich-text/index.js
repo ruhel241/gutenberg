@@ -21,7 +21,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, UP, DOWN, rawShortcut } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -118,13 +118,13 @@ export class RichText extends Component {
 
 	componentDidMount() {
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
-		window.addEventListener( 'mousedown', this.onCreateUndoLevel );
+		window.addEventListener( 'mousemove', this.onCreateUndoLevel );
 		window.addEventListener( 'touchstart', this.onCreateUndoLevel );
 	}
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-		window.removeEventListener( 'mousedown', this.onCreateUndoLevel );
+		window.removeEventListener( 'mousemove', this.onCreateUndoLevel );
 		window.removeEventListener( 'touchstart', this.onCreateUndoLevel );
 	}
 
@@ -416,8 +416,6 @@ export class RichText extends Component {
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
-		this.nonInputKeyEvent = false;
-
 		this.onChange( transformed, {
 			withoutHistory: true,
 			// Don't apply changes if there's no transform. Content will be up
@@ -544,8 +542,6 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const { keyCode } = event;
 
-		this.nonInputKeyEvent = true;
-
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			event.preventDefault();
 
@@ -618,6 +614,10 @@ export class RichText extends Component {
 				this.splitContent();
 			}
 		}
+
+		if ( [ LEFT, RIGHT, UP, DOWN ].indexOf( keyCode ) >= 0 ) {
+			this.onCreateUndoLevel();
+		}
 	}
 
 	/**
@@ -631,12 +631,6 @@ export class RichText extends Component {
 		// BACKSPACE is pressed.
 		if ( keyCode === BACKSPACE ) {
 			this.onChange( this.createRecord(), true );
-		}
-
-		// If the user uses a key that doesn't produce any input (e.g. arrow
-		// keys), then create an undo level for the previously input if any.
-		if ( this.nonInputKeyEvent ) {
-			this.onCreateUndoLevel();
 		}
 
 		// `scrollToRect` is called on `nodechange`, whereas calling it on
