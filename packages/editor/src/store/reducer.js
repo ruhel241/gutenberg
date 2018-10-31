@@ -1117,13 +1117,13 @@ function filterWithReference( collection, predicate ) {
  *
  * @return {Array} Updated state.
  */
-export function annotations( state = { all: [], byBlockId: {} }, action ) {
+export function annotations( state = { all: [], byBlockClientId: {} }, action ) {
 	switch ( action.type ) {
 		case 'ANNOTATION_ADD':
-			const blockId = action.block;
+			const blockClientId = action.blockClientId;
 			const newAnnotation = {
 				id: action.id,
-				block: blockId,
+				blockClientId,
 				source: action.source,
 				isBlockAnnotation: action.isBlockAnnotation,
 				startXPath: action.startXPath,
@@ -1132,16 +1132,16 @@ export function annotations( state = { all: [], byBlockId: {} }, action ) {
 				endOffset: action.endOffset,
 			};
 
-			const previousAnnotationsForBlock = state.byBlockId[ blockId ] || [];
+			const previousAnnotationsForBlock = state.byBlockClientId[ blockClientId ] || [];
 
 			return {
 				all: [
 					...state.all,
 					newAnnotation,
 				],
-				byBlockId: {
-					...state.byBlockId,
-					[ newAnnotation.block ]: [ ...previousAnnotationsForBlock, action.id ],
+				byBlockClientId: {
+					...state.byBlockClientId,
+					[ blockClientId ]: [ ...previousAnnotationsForBlock, action.id ],
 				},
 			};
 
@@ -1151,7 +1151,7 @@ export function annotations( state = { all: [], byBlockId: {} }, action ) {
 
 				// We use filterWithReference to not refresh the reference if a block still has
 				// the same annotations.
-				byBlockId: mapValues( state.byBlockId, ( annotationForBlock ) => {
+				byBlockClientId: mapValues( state.byBlockClientId, ( annotationForBlock ) => {
 					return filterWithReference( annotationForBlock, ( annotationId ) => {
 						return annotationId !== action.annotationId;
 					} );
@@ -1172,7 +1172,7 @@ export function annotations( state = { all: [], byBlockId: {} }, action ) {
 
 			return {
 				all: allAnnotations,
-				byBlockId: mapValues( state.byBlockId, ( annotationForBlock ) => {
+				byBlockClientId: mapValues( state.byBlockClientId, ( annotationForBlock ) => {
 					return filterWithReference( annotationForBlock, ( annotationId ) => {
 						return ! idsToRemove.includes( annotationId );
 					} );

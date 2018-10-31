@@ -1806,7 +1806,7 @@ only relevant when the annotation is not a block annotation.
 *Parameters*
 
  * annotation: The annotation to add.
- * block: The block to add the annotation to.
+ * blockClientId: The blockClientId to add the annotation to.
  * startXPath: The XPath where the annotation should start.
  * startOffset: The offset where the annotation should start.
  * endXPath: The XPath where the annotation should end.
@@ -1829,15 +1829,6 @@ Removes all annotations of a specific source.
 *Parameters*
 
  * source: The source to remove.
-
-### moveAnnotation
-
-Moves an annotation to a different XPath.
-
-*Parameters*
-
- * annotationId: The annotation to change.
- * xpath: The new location for the annotation.
 
 ### createNotice
 

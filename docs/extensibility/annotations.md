@@ -9,7 +9,7 @@ To see the API for yourself the easiest way is to have a block that is at least 
 ```js
 wp.data.dispatch( 'core/editor' ).addAnnotation( {
 	source: "my-annotations-plugin",
-	block: wp.data.select( 'core/editor' ).getBlockOrder()[0],
+	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
 	startXPath: "text()[1]",
 	startOffset: 50,
 	endXPath: "text()[1]",
@@ -22,7 +22,7 @@ If you add some bold text to that same block, you can annotate inside the bold t
 ```js
 wp.data.dispatch( 'core/editor' ).addAnnotation( {
 	source: "my-annotations-plugin",
-	block: wp.data.select( 'core/editor' ).getBlockOrder()[0],
+	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
 	startXPath: "text()[1]",
 	startOffset: 5,
 	endXPath: "strong[1]/text()[1]",
@@ -39,7 +39,7 @@ It is also possible to annotate a block completely. In that case just provide th
 ```js
 wp.data.dispatch( 'core/editor' ).addAnnotation( {
 	source: "my-annotations-plugin",
-	block: wp.data.select( 'core/editor' ).getBlockOrder()[0],
+	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
 	isBlockAnnotation: true,
 } );
 ```

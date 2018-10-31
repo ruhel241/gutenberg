@@ -2090,24 +2090,24 @@ export function isPublishSidebarEnabled( state ) {
  * @return {Array} The annotations applicable to this block.
  */
 export const getAnnotationsForBlock = createSelector(
-	( state, clientId ) => {
+	( state, blockClientId ) => {
 		return state.annotations.all.filter( ( annotation ) => {
-			return !! annotation.isBlockAnnotation && annotation.block === clientId;
+			return !! annotation.isBlockAnnotation && annotation.blockClientId === blockClientId;
 		} );
 	},
-	( state, clientId ) => [
-		state.annotations.byBlockId[ clientId ],
+	( state, blockClientId ) => [
+		state.annotations.byBlockClientId[ blockClientId ],
 	]
 );
 
 export const getAnnotationsForRichText = createSelector(
-	( state, clientId ) => {
+	( state, blockClientId ) => {
 		return state.annotations.all.filter( ( annotation ) => {
-			return ! annotation.isBlockAnnotation && annotation.block === clientId;
+			return ! annotation.isBlockAnnotation && annotation.blockClientId === blockClientId;
 		} );
 	},
-	( state, clientId ) => [
-		state.annotations.byBlockId[ clientId ],
+	( state, blockClientId ) => [
+		state.annotations.byBlockClientId[ blockClientId ],
 	]
 );
 

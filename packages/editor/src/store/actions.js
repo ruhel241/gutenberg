@@ -808,7 +808,7 @@ export function addTermToEditedPost( slug, term ) {
  * only relevant when the annotation is not a block annotation.
  *
  * @param {Object} annotation         The annotation to add.
- * @param {string} block              The block to add the annotation to.
+ * @param {string} blockClientId      The blockClientId to add the annotation to.
  * @param {string} startXPath         The XPath where the annotation should start.
  * @param {number} startOffset        The offset where the annotation should start.
  * @param {string} endXPath           The XPath where the annotation should end.
@@ -818,11 +818,11 @@ export function addTermToEditedPost( slug, term ) {
  *
  * @return {Object} Action object.
  */
-export function addAnnotation( { block, startXPath, startOffset, endXPath, endOffset, isBlockAnnotation = false, source = 'default', id = uuid() } ) {
+export function addAnnotation( { blockClientId, startXPath, startOffset, endXPath, endOffset, isBlockAnnotation = false, source = 'default', id = uuid() } ) {
 	return {
 		type: 'ANNOTATION_ADD',
 		id,
-		block,
+		blockClientId,
 		source,
 		isBlockAnnotation,
 		startXPath,
