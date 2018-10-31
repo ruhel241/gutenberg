@@ -113,14 +113,19 @@ export class RichText extends Component {
 		this.state = {};
 
 		this.usedDeprecatedChildrenSource = Array.isArray( value );
+		this.lastHistoryValue = value;
 	}
 
 	componentDidMount() {
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
+		window.addEventListener( 'mousedown', this.onCreateUndoLevel );
+		window.addEventListener( 'touchstart', this.onCreateUndoLevel );
 	}
 
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		window.removeEventListener( 'mousedown', this.onCreateUndoLevel );
+		window.removeEventListener( 'touchstart', this.onCreateUndoLevel );
 	}
 
 	setRef( node ) {
@@ -170,8 +175,6 @@ export class RichText extends Component {
 		editor.on( 'init', this.onInit );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
-		// The change event in TinyMCE fires every time an undo level is added.
-		editor.on( 'change', this.onCreateUndoLevel );
 
 		const { unstableOnSetup } = this.props;
 		if ( unstableOnSetup ) {
@@ -413,10 +416,15 @@ export class RichText extends Component {
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
-		// Don't apply changes if there's no transform. Content will be up to
-		// date. In the future we could always let it flow back in the live DOM
-		// if there are no performance issues.
-		this.onChange( transformed, record === transformed );
+		this.nonInputKeyEvent = false;
+
+		this.onChange( transformed, {
+			withoutHistory: true,
+			// Don't apply changes if there's no transform. Content will be up
+			// to date. In the future we could always let it flow back in the
+			// live DOM if there are no performance issues.
+			_withoutApply: record === transformed,
+		} );
 	}
 
 	/**
@@ -450,7 +458,7 @@ export class RichText extends Component {
 	 * @param {boolean} _withoutApply If true, the record won't be applied to
 	 *                                the live DOM.
 	 */
-	onChange( record, _withoutApply ) {
+	onChange( record, { withoutHistory, _withoutApply } = {} ) {
 		if ( ! _withoutApply ) {
 			this.applyRecord( record );
 		}
@@ -460,28 +468,20 @@ export class RichText extends Component {
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
 		this.setState( { start, end } );
+
+		if ( ! withoutHistory ) {
+			this.onCreateUndoLevel();
+		}
 	}
 
-	onCreateUndoLevel( event ) {
-		// TinyMCE fires a `change` event when the first letter in an instance
-		// is typed. This should not create a history record in Gutenberg.
-		// https://github.com/tinymce/tinymce/blob/4.7.11/src/core/main/ts/api/UndoManager.ts#L116-L125
-		// In other cases TinyMCE won't fire a `change` with at least a previous
-		// record present, so this is a reliable check.
-		// https://github.com/tinymce/tinymce/blob/4.7.11/src/core/main/ts/api/UndoManager.ts#L272-L275
-		if ( event && event.lastLevel === null ) {
+	onCreateUndoLevel() {
+		// If the content is the same, no level needs to be created.
+		if ( this.lastHistoryValue === this.savedContent ) {
 			return;
 		}
 
-		// Always ensure the content is up-to-date. This is needed because e.g.
-		// making something bold will trigger a TinyMCE change event but no
-		// input event. Avoid dispatching an action if the original event is
-		// blur because the content will already be up-to-date.
-		if ( ! event || ! event.originalEvent || event.originalEvent.type !== 'blur' ) {
-			this.onChange( this.createRecord(), true );
-		}
-
 		this.props.onCreateUndoLevel();
+		this.lastHistoryValue = this.savedContent;
 	}
 
 	/**
@@ -543,6 +543,8 @@ export class RichText extends Component {
 	 */
 	onKeyDown( event ) {
 		const { keyCode } = event;
+
+		this.nonInputKeyEvent = true;
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			event.preventDefault();
@@ -629,6 +631,12 @@ export class RichText extends Component {
 		// BACKSPACE is pressed.
 		if ( keyCode === BACKSPACE ) {
 			this.onChange( this.createRecord(), true );
+		}
+
+		// If the user uses a key that doesn't produce any input (e.g. arrow
+		// keys), then create an undo level for the previously input if any.
+		if ( this.nonInputKeyEvent ) {
+			this.onCreateUndoLevel();
 		}
 
 		// `scrollToRect` is called on `nodechange`, whereas calling it on
