@@ -16,6 +16,8 @@ import {
 	overSome,
 	get,
 	find,
+	map,
+	partialRight,
 } from 'lodash';
 
 /**
@@ -1096,6 +1098,21 @@ export function autosave( state = null, action ) {
 }
 
 /**
+ * Filters an array based on the predicate, but keeps the reference the same if
+ * the array hasn't changed.
+ *
+ * @param {Array}    collection The collection to filter.
+ * @param {Function} predicate  Function that determines if the item should stay
+ *                              in the array.
+ * @return {Array} Filtered array.
+ */
+function filterWithReference( collection, predicate ) {
+	const filteredCollection = collection.filter( predicate );
+
+	return collection.length === filteredCollection.length ? collection : filteredCollection;
+}
+
+/**
  * Reducer managing annotations.
  *
  * @param {Array} state The annotations currently shown in the editor.
@@ -1103,39 +1120,53 @@ export function autosave( state = null, action ) {
  *
  * @return {Array} Updated state.
  */
-export function annotations( state = [], action ) {
+export function annotations( state = { all: [], byBlockId: {} }, action ) {
 	switch ( action.type ) {
 		case 'ANNOTATION_ADD':
-			return [
-				{
-					id: action.id,
-					block: action.block,
-					source: action.source,
-					isBlockAnnotation: action.isBlockAnnotation,
-					startXPath: action.startXPath,
-					startOffset: action.startOffset,
-					endXPath: action.endXPath,
-					endOffset: action.endOffset,
+			const blockId = action.block;
+			const newAnnotation = {
+				id: action.id,
+				block: blockId,
+				source: action.source,
+				isBlockAnnotation: action.isBlockAnnotation,
+				startXPath: action.startXPath,
+				startOffset: action.startOffset,
+				endXPath: action.endXPath,
+				endOffset: action.endOffset,
+			};
+
+			const previousAnnotationsForBlock = state.byBlockId[ blockId ] || [];
+
+			return {
+				all: [
+					...state.all,
+					newAnnotation,
+				],
+				byBlockId: {
+					...state.byBlockId,
+					[ newAnnotation.block ]: [ ...previousAnnotationsForBlock, action.id ],
 				},
-				...state,
-			];
+			};
 
 		case 'ANNOTATION_REMOVE':
-			return state.filter( ( annotation ) => {
-				return annotation.id !== action.annotationId;
-			} );
+			return {
+				all: state.all.filter( ( annotation ) => annotation.id !== action.annotationId ),
+
+				// We use filterWithReference to not refresh the reference if a block still has the same annotations.
+				byBlockId: map( state.byBlockId, partialRight( filterWithReference, ( annotationId ) => annotationId !== action.annotationId ) ),
+			};
 
 		case 'ANNOTATION_MOVE':
-			const annotationToMove = find( state, [ 'id', action.annotationId ] );
+			const annotationToMove = find( state.all, [ 'id', action.annotationId ] );
 			const xpath = action.xpath;
 
 			// Cannot move an annotation that isn't present.
 			if ( ! annotationToMove ) {
-				return state;
+				return state.all;
 			}
 
 			return [
-				...state.filter( ( annotation ) => {
+				...state.all.filter( ( annotation ) => {
 					return annotation.id !== action.annotationId;
 				} ),
 				{
@@ -1148,9 +1179,25 @@ export function annotations( state = [], action ) {
 			];
 
 		case 'ANNOTATION_REMOVE_SOURCE':
-			return state.filter( ( annotation ) => {
-				return annotation.source !== action.source;
+			const idsToRemove = [];
+
+			const allAnnotations = state.all.filter( ( annotation ) => {
+				if ( annotation.source === action.source ) {
+					idsToRemove.push( annotation.id );
+					return false;
+				}
+
+				return true;
 			} );
+
+			return {
+				all: allAnnotations,
+				byBlockId: map( state.byBlockId, ( annotationForBlock ) => {
+					return filterWithReference( annotationForBlock, ( annotationId ) => {
+						return ! idsToRemove.includes( annotationId );
+					} );
+				} ),
+			};
 	}
 
 	return state;
