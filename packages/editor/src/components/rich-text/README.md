@@ -68,9 +68,6 @@ An annotation has the following shape:
 	// The source of the annotation, will be used for the HTML class.
 	"source": "annotations-tester",
 	
-	// The ID of the block to annotate. Currently text annotation will try to annotate all RichText elements within a block.
-	"block": "[blockId]",
-	
 	// The starting XPath for the annotation, this is relative to the `RichText` containing element. Must be continious from the container element. Matched element must be a text node.
 	"startXPath": "text()[1]",
 	
