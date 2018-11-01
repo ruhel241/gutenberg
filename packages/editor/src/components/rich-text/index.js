@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import {
-	defer,
 	find,
 	isNil,
 	isEqual,
@@ -21,7 +20,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, UP, DOWN, rawShortcut } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -56,6 +55,7 @@ import TinyMCE, { TINYMCE_ZWSP } from './tinymce';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
+import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
 /**
  * Browser dependencies
@@ -75,7 +75,6 @@ export class RichText extends Component {
 			this.multilineWrapperTags = [ 'ul', 'ol' ];
 		}
 
-		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
@@ -84,7 +83,6 @@ export class RichText extends Component {
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
-		this.onPropagateUndo = this.onPropagateUndo.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
@@ -172,9 +170,7 @@ export class RichText extends Component {
 	onSetup( editor ) {
 		this.editor = editor;
 
-		editor.on( 'init', this.onInit );
 		editor.on( 'nodechange', this.onNodeChange );
-		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
 
 		const { unstableOnSetup } = this.props;
 		if ( unstableOnSetup ) {
@@ -185,35 +181,6 @@ export class RichText extends Component {
 	setFocusedElement() {
 		if ( this.props.setFocusedElement ) {
 			this.props.setFocusedElement( this.props.instanceId );
-		}
-	}
-
-	onInit() {
-		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
-		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
-
-		// Remove TinyMCE Core shortcut for consistency with global editor
-		// shortcuts. Also clashes with Mac browsers.
-		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
-	}
-
-	/**
-	 * Handles an undo event from TinyMCE.
-	 *
-	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
-	 */
-	onPropagateUndo( event ) {
-		const { onUndo, onRedo } = this.props;
-		const { command } = event;
-
-		if ( command === 'Undo' && onUndo ) {
-			defer( onUndo );
-			event.preventDefault();
-		}
-
-		if ( command === 'Redo' && onRedo ) {
-			defer( onRedo );
-			event.preventDefault();
 		}
 	}
 
@@ -916,6 +883,7 @@ export class RichText extends Component {
 						</Fragment>
 					) }
 				</Autocomplete>
+				<RemoveBrowserShortcuts />
 			</div>
 		);
 	}

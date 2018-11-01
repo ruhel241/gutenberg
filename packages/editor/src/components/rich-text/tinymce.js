@@ -211,12 +211,14 @@ export default class TinyMCE extends Component {
 
 				editor.on( 'init', () => {
 					// See https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
-					[ 'b', 'i', 'u' ].forEach( ( character ) => {
+					[ 'b', 'i', 'u', 'z', 'y', 'z' ].forEach( ( character ) => {
 						editor.shortcuts.remove( `meta+${ character }` );
 					} );
 					[ 1, 2, 3, 4, 5, 6, 7, 8, 9 ].forEach( ( number ) => {
 						editor.shortcuts.remove( `access+${ number }` );
 					} );
+
+					editor.shortcuts.remove( 'meta+shift+z' );
 
 					editor.dom.setHTML = setHTML;
 				} );
