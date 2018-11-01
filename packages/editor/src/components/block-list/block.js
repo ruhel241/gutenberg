@@ -519,13 +519,6 @@ export class BlockListBlock extends Component {
 						onDragEnd={ this.onDragEnd }
 					/>
 				) }
-				{ shouldShowBreadcrumb && (
-					<BlockBreadcrumb
-						clientId={ clientId }
-						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
-					/>
-				) }
-				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && (
 					<BlockMultiControls rootClientId={ rootClientId } />
 				) }
@@ -536,6 +529,13 @@ export class BlockListBlock extends Component {
 					className="editor-block-list__block-edit"
 					data-block={ clientId }
 				>
+					{ shouldShowBreadcrumb && (
+						<BlockBreadcrumb
+							clientId={ clientId }
+							isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
+						/>
+					) }
+					{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && blockEdit }
 						{ isValid && mode === 'html' && (
