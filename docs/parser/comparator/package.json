@@ -4,6 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build:js-sync-runner": "docker build -t js-sync-runner -f runner-js-sync.Dockerfile .",
+    "build:php-sync-runner": "docker build -t php-sync-runner -f runner-php-sync.Dockerfile .",
+    "start:spec-js": "docker run --rm -it -p 8001:80 -v $(pwd)/../../../packages/block-serialization-spec-parser/parser.js:/web/test-parser.js -v $(pwd)/parser-js-pegjs.js:/web/parser.js -v $(pwd)/runner-js-sync.js:/web/index.js js-sync-runner",
+    "start:spec-php": "docker run --rm -it -p 8002:80 -v $(pwd)/../../../lib/parser.php:/post.peg.php -v $(pwd)/parser-php-php-pegjs.php:/parser.php -v $(pwd)/runner-php-sync.php:/web/index.php php-sync-runner",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
