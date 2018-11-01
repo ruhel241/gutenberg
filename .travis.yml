@@ -69,3 +69,9 @@ jobs:
       script:
         - npm install || exit 1
         - ./bin/run-e2e-tests.sh || exit 1
+
+    - stage: test
+      env: WP_VERSION=latest E2E_ROLE=author
+      script:
+        - npm install || exit 1
+        - ./bin/run-e2e-tests.sh || exit 1
