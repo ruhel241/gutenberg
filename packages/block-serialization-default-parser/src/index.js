@@ -27,7 +27,7 @@ function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
 	};
 }
 
-export const parse = ( doc ) => {
+const parse = ( doc ) => {
 	document = doc;
 	offset = 0;
 	output = [];
@@ -43,7 +43,11 @@ export const parse = ( doc ) => {
 
 function proceed() {
 	const next = nextToken();
-	const [ tokenType, blockName, attrs, startOffset, tokenLength ] = next;
+	const tokenType = next[ 0 ];
+	const blockName = next[ 1 ];
+	const attrs = next[ 2 ];
+	const startOffset = next[ 3 ];
+	const tokenLength = next[ 4 ];
 	const stackDepth = stack.length;
 
 	// we may have some HTML soup before the next block
@@ -189,7 +193,12 @@ function nextToken() {
 	}
 
 	const startedAt = matches.index;
-	const [ match, closerMatch, namespaceMatch, nameMatch, attrsMatch, voidMatch ] = matches;
+	const match = matches[ 0 ];
+	const closerMatch = matches[ 1 ];
+	const namespaceMatch = matches[ 2 ];
+	const nameMatch = matches[ 3 ];
+	const attrsMatch = matches[ 4 ];
+	const voidMatch = matches[ 5 ];
 
 	const length = match.length;
 	const isCloser = !! closerMatch;
@@ -252,3 +261,7 @@ function addBlockFromStack( endOffset ) {
 
 	output.push( block );
 }
+
+module.exports = {
+	parse,
+};
