@@ -1807,12 +1807,15 @@ only relevant when the annotation is not a block annotation.
 
  * annotation: The annotation to add.
  * blockClientId: The blockClientId to add the annotation to.
- * startXPath: The XPath where the annotation should start.
- * startOffset: The offset where the annotation should start.
- * endXPath: The XPath where the annotation should end.
- * endOffset: The offset where the annotation should end.
+ * range: The range at which to apply this annotaiton.
+ * range.startXPath: The XPath where the annotation should start.
+ * range.startOffset: The offset where the annotation should start.
+ * range.endXPath: The XPath where the annotation should end.
+ * range.endOffset: The offset where the annotation should end.
+ * string: [selector="range"] The way to apply this annotation.
  * string: [source="default"] The source that added the annotation.
- * string: [id=uuid()]        The ID the annotation should have. Generates a UUID by default.
+ * string: [id=uuid()]        The ID the annotation should have.
+                                   Generates a UUID by default.
 
 ### removeAnnotation
 
