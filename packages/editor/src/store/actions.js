@@ -809,27 +809,32 @@ export function addTermToEditedPost( slug, term ) {
  *
  * @param {Object} annotation         The annotation to add.
  * @param {string} blockClientId      The blockClientId to add the annotation to.
- * @param {string} startXPath         The XPath where the annotation should start.
- * @param {number} startOffset        The offset where the annotation should start.
- * @param {string} endXPath           The XPath where the annotation should end.
- * @param {number} endOffset          The offset where the annotation should end.
+ * @param {Object} range              The range at which to apply this annotaiton.
+ * @param {string} range.startXPath   The XPath where the annotation should start.
+ * @param {number} range.startOffset  The offset where the annotation should start.
+ * @param {string} range.endXPath     The XPath where the annotation should end.
+ * @param {number} range.endOffset    The offset where the annotation should end.
+ * @param {string} [selector="range"] The way to apply this annotation.
  * @param {string} [source="default"] The source that added the annotation.
- * @param {string} [id=uuid()]        The ID the annotation should have. Generates a UUID by default.
+ * @param {string} [id=uuid()]        The ID the annotation should have.
+ *                                    Generates a UUID by default.
  *
  * @return {Object} Action object.
  */
-export function addAnnotation( { blockClientId, startXPath, startOffset, endXPath, endOffset, isBlockAnnotation = false, source = 'default', id = uuid() } ) {
-	return {
+export function addAnnotation( { blockClientId, range = null, selector = 'range', source = 'default', id = uuid() } ) {
+	const action = {
 		type: 'ANNOTATION_ADD',
 		id,
 		blockClientId,
 		source,
-		isBlockAnnotation,
-		startXPath,
-		startOffset,
-		endXPath,
-		endOffset,
+		selector,
 	};
+
+	if ( selector === 'range' ) {
+		action.range = range;
+	}
+
+	return action;
 }
 
 /**

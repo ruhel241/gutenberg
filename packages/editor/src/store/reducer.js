@@ -1125,11 +1125,8 @@ export function annotations( state = { all: [], byBlockClientId: {} }, action ) 
 				id: action.id,
 				blockClientId,
 				source: action.source,
-				isBlockAnnotation: action.isBlockAnnotation,
-				startXPath: action.startXPath,
-				startOffset: action.startOffset,
-				endXPath: action.endXPath,
-				endOffset: action.endOffset,
+				selector: action.selector,
+				range: action.range,
 			};
 
 			const previousAnnotationsForBlock = state.byBlockClientId[ blockClientId ] || [];

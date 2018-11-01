@@ -10,10 +10,12 @@ To see the API for yourself the easiest way is to have a block that is at least 
 wp.data.dispatch( 'core/editor' ).addAnnotation( {
 	source: "my-annotations-plugin",
 	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
-	startXPath: "text()[1]",
-	startOffset: 50,
-	endXPath: "text()[1]",
-	endOffset: 100
+	range: {
+		startXPath: "text()[1]",
+		startOffset: 50,
+		endXPath: "text()[1]",
+		endOffset: 100,
+	},
 } );
 ```
 
@@ -23,10 +25,12 @@ If you add some bold text to that same block, you can annotate inside the bold t
 wp.data.dispatch( 'core/editor' ).addAnnotation( {
 	source: "my-annotations-plugin",
 	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
-	startXPath: "text()[1]",
-	startOffset: 5,
-	endXPath: "strong[1]/text()[1]",
-	endOffset: 3
+	range: {
+		startXPath: "text()[1]",
+		startOffset: 5,
+		endXPath: "strong[1]/text()[1]",
+		endOffset: 3,
+	},
 } );
 ```
 
@@ -34,13 +38,13 @@ All available properties can be found in the API documentation of the `addAnnota
 
 ## Block annotation
 
-It is also possible to annotate a block completely. In that case just provide the `blockAnnotation` property and set it to `true`:
+It is also possible to annotate a block completely. In that case just provide the `selector` property and set it to `block`. The default `selector` is `range`, which can be used for text annotation.
 
 ```js
 wp.data.dispatch( 'core/editor' ).addAnnotation( {
 	source: "my-annotations-plugin",
 	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
-	isBlockAnnotation: true,
+	selector: "block",
 } );
 ```
 
