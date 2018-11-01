@@ -15,6 +15,7 @@ export { default as RegistryProvider, RegistryConsumer } from './components/regi
 export { createRegistry } from './registry';
 export { plugins };
 
+
 /**
  * The combineReducers helper function turns an object whose values are different
  * reducing functions into a single reducing function you can pass to registerReducer.
