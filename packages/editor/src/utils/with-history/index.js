@@ -112,6 +112,12 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 			return state;
 		}
 
+		// Temporary: illustrates the problem with RECEIVE_BLOCKS creating an
+		// extra undo level at a random time.
+		if ( action.type === 'RECEIVE_BLOCKS' ) {
+			return state;
+		}
+
 		let nextPast = past;
 
 		if (
